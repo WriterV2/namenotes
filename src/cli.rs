@@ -29,6 +29,7 @@ pub struct WriteArgs {
     pub gender: Option<Gender>,
 }
 
+// Arguments for "read" subcommand
 #[derive(Debug, Args)]
 pub struct ReadArgs {
     // optional argument: "-n", "--name"
@@ -46,6 +47,18 @@ pub struct ReadArgs {
     // optional argument: "-g", "--gender"
     #[clap(short, long, arg_enum)]
     pub gender: Option<Gender>,
+
+    // optional argument: "--length"
+    #[clap(long)]
+    pub length: Option<u8>,
+
+    // optional argument: "-c", "--contains"
+    #[clap(short, long)]
+    pub contains: Option<String>,
+
+    // optional argument: "--contains-letter"
+    #[clap(long)]
+    pub contains_letter: Option<char>,
 }
 
 #[derive(Subcommand)]
