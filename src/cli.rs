@@ -1,4 +1,5 @@
 use clap::{Arg, ArgEnum, Args, Parser, Subcommand};
+use serde::{Deserialize, Serialize};
 
 // Top-level CLI arguments
 #[derive(Parser)]
@@ -79,7 +80,7 @@ pub enum Commands {
     Read(ReadArgs),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, ArgEnum)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, ArgEnum, Serialize, Deserialize)]
 pub enum Gender {
     Male,
     Female,
