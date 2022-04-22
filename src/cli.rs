@@ -27,6 +27,10 @@ pub struct WriteArgs {
     // optional argument: "-g", "--gender"
     #[clap(short, long, arg_enum)]
     pub gender: Option<Gender>,
+
+    // boolean argument: "-f", "--fictional"
+    #[clap(short, long)]
+    pub fictional: bool,
 }
 
 // Arguments for "read" subcommand
@@ -59,6 +63,10 @@ pub struct ReadArgs {
     // optional argument: "--contains-letter"
     #[clap(long)]
     pub contains_letter: Option<char>,
+
+    // boolean argument: "-f", "--fictional"
+    #[clap(short, long)]
+    pub fictional: bool,
 }
 
 #[derive(Subcommand)]
