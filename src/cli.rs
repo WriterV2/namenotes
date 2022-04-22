@@ -45,11 +45,7 @@ pub struct ReadArgs {
     pub language: Option<String>,
 
     // optional argument: "-m", "--meaning"
-    #[clap(
-        short,
-        long,
-        help = "Filter by sequence of characters in meaning of name"
-    )]
+    #[clap(short, long, help = "Filter by sequence of characters in meaning of name")]
     pub meaning: Option<String>,
 
     // optional argument: "-g", "--gender"
@@ -61,7 +57,6 @@ pub struct ReadArgs {
     pub length: Option<u8>,
 
     // optional argument: "-c", "--contains"
-    #[rustfmt::skip]
     #[clap(short, long, help = "Filter by sequence of characters name has to contain")]
     pub contains: Option<String>,
 
