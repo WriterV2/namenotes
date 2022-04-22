@@ -1,4 +1,4 @@
-use clap::{ArgEnum, Args, Parser, Subcommand};
+use clap::{Arg, ArgEnum, Args, Parser, Subcommand};
 
 // Top-level CLI arguments
 #[derive(Parser)]
@@ -7,6 +7,10 @@ pub struct Cli {
     // Subcommands: "write", "read"
     #[clap(subcommand)]
     pub command: Commands,
+
+    // argument with default value: "-p", "--path"
+    #[clap(short, long, help = "Absolute path to directory containing namenotes.json", default_value = "~/")]
+    pub path: String,
 }
 
 // Arguments for "write" subcommand
