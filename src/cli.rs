@@ -10,8 +10,12 @@ pub struct Cli {
     pub command: Commands,
 
     // argument with default value: "-p", "--path"
-    #[clap(short, long, help = "Absolute path to directory containing namenotes.json", default_value = "~/")]
-    pub path: String,
+    #[clap(
+        short,
+        long,
+        help = "Optional path to directory containing namenotes.json - default: home directory"
+    )]
+    pub path: Option<std::path::PathBuf>,
 }
 
 // Arguments for "write" subcommand
@@ -30,8 +34,14 @@ pub struct WriteArgs {
     pub meaning: Option<String>,
 
     // optional argument: "-g", "--gender"
-    #[clap(short, long, arg_enum, help = "Gender of name")]
-    pub gender: Option<Gender>,
+    #[clap(
+        short,
+        long,
+        arg_enum,
+        help = "Gender of name",
+        default_value = "unisex"
+    )]
+    pub gender: Gender,
 
     // boolean argument: "-f", "--fictional"
     #[clap(short, long, help = "If name is fictional")]
@@ -50,7 +60,11 @@ pub struct ReadArgs {
     pub language: Option<String>,
 
     // optional argument: "-m", "--meaning"
-    #[clap(short, long, help = "Filter by sequence of characters in meaning of name")]
+    #[clap(
+        short,
+        long,
+        help = "Filter by sequence of characters in meaning of name"
+    )]
     pub meaning: Option<String>,
 
     // optional argument: "-g", "--gender"
@@ -62,7 +76,11 @@ pub struct ReadArgs {
     pub length: Option<u8>,
 
     // optional argument: "-c", "--contains"
-    #[clap(short, long, help = "Filter by sequence of characters name has to contain")]
+    #[clap(
+        short,
+        long,
+        help = "Filter by sequence of characters name has to contain"
+    )]
     pub contains: Option<String>,
 
     // optional argument: "--contains-letter"

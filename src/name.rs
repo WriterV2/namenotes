@@ -17,3 +17,25 @@ pub struct Name {
 // All names stored
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Names(pub Vec<Name>);
+
+impl Name {
+    // create empty string from None or return value
+    pub fn none_to_empty_string(s: &Option<String>) -> String {
+        if let Some(slice) = s {
+            slice.to_string()
+        } else {
+            String::new()
+        }
+    }
+
+    // create Name struct from parsed arguments of write command
+    pub fn new_from_writeargs(args: &cli::WriteArgs) -> Name {
+        Name {
+            name: args.name.to_string(),
+            meaning: Self::none_to_empty_string(&args.meaning),
+            language: Self::none_to_empty_string(&args.language),
+            fictional: args.fictional,
+            gender: args.gender,
+        }
+    }
+}
