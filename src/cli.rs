@@ -19,7 +19,7 @@ pub struct Cli {
 }
 
 // Arguments for "write" subcommand
-#[derive(Debug, Args)]
+#[derive(Debug, Args, Serialize, Deserialize)]
 pub struct WriteArgs {
     // required argument: "-n", "--name"
     #[clap(short, long, help = "Name to note down")]
@@ -49,7 +49,7 @@ pub struct WriteArgs {
 }
 
 // Arguments for "read" subcommand
-#[derive(Debug, Args)]
+#[derive(Debug, Args, Serialize, Deserialize)]
 pub struct ReadArgs {
     // optional argument: "-n", "--name"
     #[clap(short, long, help = "Filter by name")]
@@ -73,6 +73,7 @@ pub struct ReadArgs {
 
     // optional argument: "--length"
     #[clap(long, help = "Filter by length of name")]
+    #[serde(skip)]
     pub length: Option<u8>,
 
     // optional argument: "-c", "--contains"
@@ -81,10 +82,12 @@ pub struct ReadArgs {
         long,
         help = "Filter by sequence of characters name has to contain"
     )]
+    #[serde(skip)]
     pub contains: Option<String>,
 
     // optional argument: "--contains-letter"
     #[clap(long, help = "Filter by character name has to contain")]
+    #[serde(skip)]
     pub contains_letter: Option<char>,
 
     // boolean argument: "-f", "--fictional"
