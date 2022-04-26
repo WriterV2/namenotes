@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use clap::Parser;
 
 mod cli;
@@ -35,15 +33,10 @@ fn open_existing_namenotes(path: &std::path::PathBuf) -> std::fs::File {
 
 // create new namenotes file with empty names list and open it in read mode
 fn create_new_namenotes_to_read(path: &std::path::PathBuf) -> std::fs::File {
-    let mut new_file = create_new_namenotes(&path);
+    let new_file = create_new_namenotes(&path);
+    let empty_names = name::Names(Vec::new());
 
-    match new_file.write_all("Names[()]".as_bytes()) {
-        Ok(_) => (),
-        Err(write_err) => panic!(
-            "Error when trying to write empty names list to new namenotes file: {:?}",
-            write_err
-        ),
-    };
+    empty_names.write_to_json(new_file);
 
     match std::fs::File::open(&path) {
         Ok(new_file_to_read) => new_file_to_read,
