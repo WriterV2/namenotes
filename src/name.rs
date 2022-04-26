@@ -15,17 +15,10 @@ impl Names {
     }
 
     // get names from json file
-    // TODO: fix eof error
     pub fn new_from_json_file(file: std::fs::File) -> Self {
         match serde_json::from_reader(std::io::BufReader::new(file)) {
             Ok(names) => names,
-            Err(err) => {
-                if err.is_eof() {
-                    Names(Vec::new())
-                } else {
-                    panic!("New From Json File {:?}", err)
-                }
-            }
+            Err(err) => panic!("New From Json File {:?}", err),
         }
     }
 

@@ -84,7 +84,7 @@ fn main() {
         cli::Commands::Write(x) => {
             // Example for creating Names struct from arguments
             let new_names = name::Names::new_from_json(name::Names::args_to_json(&x));
-            // Example for creating Names struct from existing file - currently fails because of EOF Error and returns empty Names instead
+            // Example for creating Names struct from existing file
             let mut all_names = name::Names::new_from_json_file(open_existing_namenotes(&path));
             // Example for appending new names to old names
             all_names = all_names.append_new_names(new_names);

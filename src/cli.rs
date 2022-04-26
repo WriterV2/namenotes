@@ -27,10 +27,12 @@ pub struct WriteArgs {
 
     // optional argument: "-l", "--language"
     #[clap(short, long, help = "Language of name")]
+    #[serde(default)]
     pub language: Option<String>,
 
     // optional argument: "-m", "--meaning"
     #[clap(short, long, help = "Meaning of name")]
+    #[serde(default)]
     pub meaning: Option<String>,
 
     // optional argument: "-g", "--gender"
@@ -53,10 +55,12 @@ pub struct WriteArgs {
 pub struct ReadArgs {
     // optional argument: "-n", "--name"
     #[clap(short, long, help = "Filter by name")]
+    #[serde(default)]
     pub name: Option<String>,
 
     // optional argument: "-l", "--language"
     #[clap(short, long, help = "Filter by language of name")]
+    #[serde(default)]
     pub language: Option<String>,
 
     // optional argument: "-m", "--meaning"
@@ -65,10 +69,12 @@ pub struct ReadArgs {
         long,
         help = "Filter by sequence of characters in meaning of name"
     )]
+    #[serde(default)]
     pub meaning: Option<String>,
 
     // optional argument: "-g", "--gender"
     #[clap(short, long, arg_enum, help = "Filter by gender")]
+    #[serde(default)]
     pub gender: Option<Gender>,
 
     // optional argument: "--length"
