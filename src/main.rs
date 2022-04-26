@@ -1,4 +1,4 @@
-use std::io::{Read, Write};
+use std::io::Write;
 
 use clap::Parser;
 
@@ -18,106 +18,78 @@ fn get_path(optional_path: Option<std::path::PathBuf>) -> std::path::PathBuf {
     }
 }
 
-// read the namenotes file (create if it doesn't exist) and parse content
-fn read_namenotes(file: std::io::Result<std::fs::File>, path: &std::path::PathBuf) -> String {
-    let mut file_content = String::new();
-    match file {
-        Ok(mut file) => match file.read_to_string(&mut file_content) {
-            Ok(_) => file_content,
-            Err(readerr) => panic!(
-                "Error when trying to read existing namenotes file {:?}",
-                readerr
+// open exisitng namenotes file in read mode
+fn open_existing_namenotes(path: &std::path::PathBuf) -> std::fs::File {
+    let old_file = match std::fs::File::open(&path) {
+        Ok(file) => file,
+        Err(openerr) => match openerr.kind() {
+            std::io::ErrorKind::NotFound => create_new_namenotes_to_read(&path),
+            other_err => panic!(
+                "Error when trying to read exisiting namenotes file {:?}",
+                other_err
             ),
         },
-        Err(err) => match err.kind() {
-            std::io::ErrorKind::NotFound => {
-                match create_and_open_namenotes_file(path).read_to_string(&mut file_content) {
-                    Ok(_) => file_content,
-                    Err(create_err) => panic!(
-                        "Error when trying to read newly created namesnotes file: {:?}",
-                        create_err
-                    ),
-                }
-            }
-            other_error => panic!(
-                "Error when trying to open existing namesnotes file: {:?}",
-                other_error
-            ),
-        },
-    }
-}
-
-// create new namenotes file and open in write mode
-fn create_and_open_namenotes_file(path: &std::path::PathBuf) -> std::fs::File {
-    match std::fs::File::create(path) {
-        Ok(_) => match std::fs::File::open(path) {
-            Ok(openedfile) => openedfile,
-            Err(openerr) => panic!(
-                "Error when trying to open newly created namenotes file: {:?}",
-                openerr
-            ),
-        },
-        Err(err) => panic!("Error when trying to create namenotes file: {:?}", err),
-    }
-}
-
-// try to get Names struct from file content - pass potential error forward
-fn get_names(content: &String) -> Result<name::Names, std::io::Error> {
-    let names = serde_json::from_str(&content)?;
-    Ok(names)
-}
-
-// add new name to existing names and write to namenotes files
-fn write_names_to_file(
-    names: Result<name::Names, std::io::Error>,
-    new_name: name::Name,
-    path: &std::path::PathBuf,
-) {
-    // get existing names, else create empty names
-    let mut file_content = match names {
-        Ok(names) => names,
-        Err(_) => name::Names(Vec::new()),
     };
+    old_file
+}
 
-    file_content.0.push(new_name);
+// create new namenotes file with empty names list and open it in read mode
+fn create_new_namenotes_to_read(path: &std::path::PathBuf) -> std::fs::File {
+    let mut new_file = create_new_namenotes(&path);
 
-    let deserialized_names: String = match serde_json::to_string_pretty(&file_content) {
-        Ok(s) => s,
-        Err(_) => String::new(),
-    };
-
-    match std::fs::File::create(&path) {
-        Ok(mut newfile) => match newfile.write_all(deserialized_names.as_bytes()) {
-            Ok(_) => (),
-            Err(err) => panic!(
-                "Error when trying to write names to newly created namenotes file: {:?}",
-                err
-            ),
-        },
-        Err(err) => panic!(
-            "Error when trying to create new namenotes file before writing: {:?}",
-            err
+    match new_file.write_all("Names[()]".as_bytes()) {
+        Ok(_) => (),
+        Err(write_err) => panic!(
+            "Error when trying to write empty names list to new namenotes file: {:?}",
+            write_err
         ),
     };
+
+    match std::fs::File::open(&path) {
+        Ok(new_file_to_read) => new_file_to_read,
+        Err(read_err) => panic!(
+            "Error when trying to read newly created namenotes file with empty names list: {:?}",
+            read_err
+        ),
+    }
+}
+
+// create new namenotes file in write mode
+fn create_new_namenotes(path: &std::path::PathBuf) -> std::fs::File {
+    match std::fs::File::create(&path) {
+        Ok(file) => file,
+        Err(create_err) => panic!(
+            "Error when trying to create new namenotes file {:?}",
+            create_err
+        ),
+    }
 }
 
 fn main() {
+    // parsed CLI arguments: WriteArgs for write command, ReadArgs for read command
     let parsed_args = cli::Cli::parse();
 
+    // path specified by user with path argument or home directory
     let mut path: std::path::PathBuf = get_path(parsed_args.path);
     path.push("namenotes.json");
-    let f = std::fs::File::open(&path);
-
-    let content = read_namenotes(f, &path);
-    let names: Result<name::Names, std::io::Error> = get_names(&content);
 
     match parsed_args.command {
         // Read Mode
-        cli::Commands::Read(x) => {}
+        cli::Commands::Read(x) => {
+            // Example for JSON representation of name constructed by arguments
+            println!("{}", name::Names::args_to_json(&x));
+        }
 
         // Write Mode
         cli::Commands::Write(x) => {
-            write_names_to_file(names, name::Name::new_from_writeargs(&x), &path);
+            // Example for creating Names struct from arguments
+            let new_names = name::Names::new_from_json(name::Names::args_to_json(&x));
+            // Example for creating Names struct from existing file - currently fails because of EOF Error and returns empty Names instead
+            let mut all_names = name::Names::new_from_json_file(open_existing_namenotes(&path));
+            // Example for appending new names to old names
+            all_names = all_names.append_new_names(new_names);
+            // Example for writing all names to file
+            all_names.write_to_json(create_new_namenotes(&path));
         }
     };
 }
