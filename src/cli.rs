@@ -1,4 +1,4 @@
-use clap::{Arg, ArgEnum, Args, Parser, Subcommand};
+use clap::{ArgEnum, Args, Parser, Subcommand};
 use serde::{Deserialize, Serialize};
 
 // Top-level CLI arguments
@@ -48,6 +48,37 @@ pub struct WriteArgs {
     // boolean argument: "-f", "--fictional"
     #[clap(short, long, help = "If name is fictional")]
     pub fictional: bool,
+}
+
+// display name - only show attributes, if available
+impl std::fmt::Display for WriteArgs {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name = format!("'{}'\n", self.name);
+        let language = if let Some(l) = &self.language {
+            format!("Language: {}\n", l.to_string())
+        } else {
+            String::new()
+        };
+        let meaning = if let Some(m) = &self.meaning {
+            format!("Meaning: {}\n", m.to_string())
+        } else {
+            String::new()
+        };
+        let gender = format!(
+            "Gender: {}\n",
+            match self.gender {
+                Gender::Male => "Masculine".to_string(),
+                Gender::Female => "Feminine".to_string(),
+                _ => "Unisex".to_string(),
+            }
+        );
+
+        let fictional = match &self.fictional {
+            true => String::from("(fictional)\n"),
+            false => String::new(),
+        };
+        write!(f, "{}{}{}{}{}", name, language, meaning, gender, fictional)
+    }
 }
 
 // Arguments for "read" subcommand

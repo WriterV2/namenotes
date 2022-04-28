@@ -53,3 +53,16 @@ impl Names {
         }
     }
 }
+
+// display names and show how many names found
+impl std::fmt::Display for Names {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut string = String::new();
+        let mut count = 0;
+        for name in self.0.iter() {
+            string.push_str(&format!("{}\n", name));
+            count += 1;
+        }
+        write!(f, "\n{} Names found: \n\n{}", count, string)
+    }
+}
