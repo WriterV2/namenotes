@@ -50,6 +50,97 @@ pub struct WriteArgs {
     pub fictional: bool,
 }
 
+impl WriteArgs {
+    // whether this name and its attributes matches with the filter arguments
+    pub fn matches_readargs(&self, args: &ReadArgs) -> bool {
+        // if name was specified and if it matches with this name
+        let name_matches = if let Some(args_name) = args.name.as_ref() {
+            Some(&self.name == args_name)
+        } else {
+            None
+        };
+
+        // if a letter that name must contain was specified and if this name contains it
+        let name_contains_char = if let Some(args_char) = args.contains_letter {
+            Some(self.name.contains(args_char))
+        } else {
+            None
+        };
+
+        // if a sequence of letters that name must contain was specified and if this name contains it
+        let name_contains_string = if let Some(args_string) = args.contains.as_ref() {
+            Some(self.name.contains(args_string))
+        } else {
+            None
+        };
+
+        // if the language of the name was specified, if it was specified in this name and if they both match
+        let language_matches =
+            if let (Some(lang), Some(args_lang)) = (&self.language, args.language.as_ref()) {
+                Some(lang == args_lang)
+            } else {
+                None
+            };
+
+        // if the meaning of the name was specified, if it was specified in this name and if they both match
+        let meaning_matches =
+            if let (Some(meaning), Some(args_meaning)) = (&self.meaning, args.meaning.as_ref()) {
+                // TODO: currently always returns true, needs to be fixed
+                Some(meaning.contains(&*args_meaning))
+            } else {
+                None
+            };
+
+        // if the gender of the name was specified and if the specified gender accepts this name's gender
+        // Unisex <- Unisex | Male <- Unisex, Male | Female <- Unisex, Female
+        let gender_matches = if let Some(args_gender) = args.gender {
+            match (self.gender, args_gender) {
+                (Gender::Male, Gender::Female) => Some(false),
+                (Gender::Female, Gender::Male) => Some(false),
+                (Gender::Male, Gender::Unisex) => Some(false),
+                (Gender::Female, Gender::Unisex) => Some(false),
+                _ => Some(true),
+            }
+        } else {
+            None
+        };
+
+        // if name was specified as fictional and if this name is fictional
+        let fictional_matches = if args.fictional {
+            Some(self.fictional == args.fictional)
+        } else {
+            None
+        };
+
+        // the values of all specified attributes
+        let mut specified_args = Vec::new();
+
+        for arg in [
+            name_matches,
+            name_contains_char,
+            name_contains_string,
+            language_matches,
+            meaning_matches,
+            gender_matches,
+            fictional_matches,
+        ]
+        .iter()
+        {
+            if let Some(a) = arg {
+                specified_args.push(*a);
+            }
+        }
+
+        // if no attribute was specified, return all names
+        if specified_args.is_empty() {
+            true
+        } else {
+            // name is a match, if all specified attributes match
+            !specified_args.contains(&false)
+        }
+    }
+}
+
 // display name - only show attributes, if available
 impl std::fmt::Display for WriteArgs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

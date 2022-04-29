@@ -69,8 +69,9 @@ fn main() {
     match parsed_args.command {
         // Read Mode
         cli::Commands::Read(x) => {
-            // Example for JSON representation of name constructed by arguments
-            println!("{}", name::Names::args_to_json(&x));
+            let all_names = name::Names::new_from_json_file(open_existing_namenotes(&path));
+            // Example for returning a list of names filtered by arguments of read command
+            println!("{}", all_names.filtered_list(x));
         }
 
         // Write Mode

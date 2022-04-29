@@ -52,6 +52,17 @@ impl Names {
             Err(err) => panic!("Write to Json {:?}", err),
         }
     }
+
+    // filter names by arguments of read command
+    pub fn filtered_list(self, args: cli::ReadArgs) -> Names {
+        let mut filtered_list = Names(Vec::new());
+        for name in self.0.into_iter() {
+            if name.matches_readargs(&args) {
+                filtered_list.0.push(name);
+            }
+        }
+        filtered_list
+    }
 }
 
 // display names and show how many names found
