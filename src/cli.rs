@@ -75,21 +75,26 @@ impl WriteArgs {
         };
 
         // if the language of the name was specified, if it was specified in this name and if they both match
-        let language_matches =
-            if let (Some(lang), Some(args_lang)) = (&self.language, args.language.as_ref()) {
+        let language_matches = if let Some(args_lang) = args.language.as_ref() {
+            if let Some(lang) = &self.language {
                 Some(lang == args_lang)
             } else {
-                None
-            };
+                Some(false)
+            }
+        } else {
+            None
+        };
 
         // if the meaning of the name was specified, if it was specified in this name and if they both match
-        let meaning_matches =
-            if let (Some(meaning), Some(args_meaning)) = (&self.meaning, args.meaning.as_ref()) {
-                // TODO: currently always returns true, needs to be fixed
+        let meaning_matches = if let Some(args_meaning) = args.meaning.as_ref() {
+            if let Some(meaning) = &self.meaning {
                 Some(meaning.contains(&*args_meaning))
             } else {
-                None
-            };
+                Some(false)
+            }
+        } else {
+            None
+        };
 
         // if the gender of the name was specified and if the specified gender accepts this name's gender
         // Unisex <- Unisex | Male <- Unisex, Male | Female <- Unisex, Female
