@@ -54,25 +54,18 @@ impl WriteArgs {
     // whether this name and its attributes matches with the filter arguments
     pub fn matches_readargs(&self, args: &ReadArgs) -> bool {
         // if name was specified and if it matches with this name
-        let name_matches = if let Some(args_name) = args.name.as_ref() {
-            Some(&self.name == args_name)
-        } else {
-            None
-        };
+        let name_matches = args.name.as_ref().map(|args_name| &self.name == args_name);
 
         // if a letter that name must contain was specified and if this name contains it
-        let name_contains_char = if let Some(args_char) = args.contains_letter {
-            Some(self.name.contains(args_char))
-        } else {
-            None
-        };
+        let name_contains_char = args
+            .contains_letter
+            .map(|args_char| self.name.contains(args_char));
 
         // if a sequence of letters that name must contain was specified and if this name contains it
-        let name_contains_string = if let Some(args_string) = args.contains.as_ref() {
-            Some(self.name.contains(args_string))
-        } else {
-            None
-        };
+        let name_contains_string = args
+            .contains
+            .as_ref()
+            .map(|args_string| self.name.contains(args_string));
 
         // if the language of the name was specified, if it was specified in this name and if they both match
         let language_matches = if let Some(args_lang) = args.language.as_ref() {
@@ -88,7 +81,7 @@ impl WriteArgs {
         // if the meaning of the name was specified, if it was specified in this name and if they both match
         let meaning_matches = if let Some(args_meaning) = args.meaning.as_ref() {
             if let Some(meaning) = &self.meaning {
-                Some(meaning.contains(&*args_meaning))
+                Some(meaning.contains(args_meaning))
             } else {
                 Some(false)
             }
@@ -130,10 +123,9 @@ impl WriteArgs {
             fictional_matches,
         ]
         .iter()
+        .flatten()
         {
-            if let Some(a) = arg {
-                specified_args.push(*a);
-            }
+            specified_args.push(*arg);
         }
 
         // if no attribute was specified, return all names
@@ -151,12 +143,12 @@ impl std::fmt::Display for WriteArgs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = format!("'{}'\n", self.name);
         let language = if let Some(l) = &self.language {
-            format!("Language: {}\n", l.to_string())
+            format!("Language: {}\n", l)
         } else {
             String::new()
         };
         let meaning = if let Some(m) = &self.meaning {
-            format!("Meaning: {}\n", m.to_string())
+            format!("Meaning: {}\n", m)
         } else {
             String::new()
         };

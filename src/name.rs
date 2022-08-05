@@ -1,5 +1,6 @@
 use crate::cli;
 use serde::{Deserialize, Serialize};
+use std::fmt::Write;
 
 // All names stored
 #[derive(Debug, Serialize, Deserialize)]
@@ -71,7 +72,8 @@ impl std::fmt::Display for Names {
         let mut string = String::new();
         let mut count = 0;
         for name in self.0.iter() {
-            string.push_str(&format!("{}\n", name));
+            //string.push_str(&format!("{}\n", name));
+            writeln!(string, "{}", name).unwrap();
             count += 1;
         }
         write!(f, "\n{} Names found: \n\n{}", count, string)

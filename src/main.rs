@@ -7,33 +7,31 @@ mod name;
 fn get_path(optional_path: Option<std::path::PathBuf>) -> std::path::PathBuf {
     if let Some(o_path) = optional_path {
         o_path
+    } else if let Some(home) = dirs::home_dir() {
+        home
     } else {
-        if let Some(home) = dirs::home_dir() {
-            home
-        } else {
-            panic!("Home directory not found");
-        }
+        panic!("Home directory not found");
     }
 }
 
 // open exisitng namenotes file in read mode
 fn open_existing_namenotes(path: &std::path::PathBuf) -> std::fs::File {
-    let old_file = match std::fs::File::open(&path) {
+    
+    match std::fs::File::open(&path) {
         Ok(file) => file,
         Err(openerr) => match openerr.kind() {
-            std::io::ErrorKind::NotFound => create_new_namenotes_to_read(&path),
+            std::io::ErrorKind::NotFound => create_new_namenotes_to_read(path),
             other_err => panic!(
                 "Error when trying to read exisiting namenotes file {:?}",
                 other_err
             ),
         },
-    };
-    old_file
+    }
 }
 
 // create new namenotes file with empty names list and open it in read mode
 fn create_new_namenotes_to_read(path: &std::path::PathBuf) -> std::fs::File {
-    let new_file = create_new_namenotes(&path);
+    let new_file = create_new_namenotes(path);
     let empty_names = name::Names(Vec::new());
 
     empty_names.write_to_json(new_file);
