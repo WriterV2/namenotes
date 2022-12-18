@@ -16,8 +16,7 @@ fn get_path(optional_path: Option<std::path::PathBuf>) -> std::path::PathBuf {
 
 // open exisitng namenotes file in read mode
 fn open_existing_namenotes(path: &std::path::PathBuf) -> std::fs::File {
-    
-    match std::fs::File::open(&path) {
+    match std::fs::File::open(path) {
         Ok(file) => file,
         Err(openerr) => match openerr.kind() {
             std::io::ErrorKind::NotFound => create_new_namenotes_to_read(path),
@@ -36,7 +35,7 @@ fn create_new_namenotes_to_read(path: &std::path::PathBuf) -> std::fs::File {
 
     empty_names.write_to_json(new_file);
 
-    match std::fs::File::open(&path) {
+    match std::fs::File::open(path) {
         Ok(new_file_to_read) => new_file_to_read,
         Err(read_err) => panic!(
             "Error when trying to read newly created namenotes file with empty names list: {:?}",
@@ -47,7 +46,7 @@ fn create_new_namenotes_to_read(path: &std::path::PathBuf) -> std::fs::File {
 
 // create new namenotes file in write mode
 fn create_new_namenotes(path: &std::path::PathBuf) -> std::fs::File {
-    match std::fs::File::create(&path) {
+    match std::fs::File::create(path) {
         Ok(file) => file,
         Err(create_err) => panic!(
             "Error when trying to create new namenotes file {:?}",
