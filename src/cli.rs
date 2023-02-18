@@ -90,13 +90,13 @@ impl WriteArgs {
         };
 
         // if the gender of the name was specified and if the specified gender accepts this name's gender
-        // Unisex <- Unisex | Male <- Unisex, Male | Female <- Unisex, Female
+        // Unisex <- Unisex | Masculine <- Unisex, Male | Feminine <- Unisex, Female
         let gender_matches = if let Some(args_gender) = args.gender {
             match (self.gender, args_gender) {
-                (Gender::Male, Gender::Female) => Some(false),
-                (Gender::Female, Gender::Male) => Some(false),
-                (Gender::Male, Gender::Unisex) => Some(false),
-                (Gender::Female, Gender::Unisex) => Some(false),
+                (Gender::Masculine, Gender::Feminine) => Some(false),
+                (Gender::Feminine, Gender::Masculine) => Some(false),
+                (Gender::Masculine, Gender::Unisex) => Some(false),
+                (Gender::Feminine, Gender::Unisex) => Some(false),
                 _ => Some(true),
             }
         } else {
@@ -155,8 +155,8 @@ impl std::fmt::Display for WriteArgs {
         let gender = format!(
             "Gender: {}\n",
             match self.gender {
-                Gender::Male => "Masculine".to_string(),
-                Gender::Female => "Feminine".to_string(),
+                Gender::Masculine => "Masculine".to_string(),
+                Gender::Feminine => "Feminine".to_string(),
                 _ => "Unisex".to_string(),
             }
         );
@@ -228,7 +228,7 @@ pub enum Commands {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, ArgEnum, Serialize, Deserialize)]
 pub enum Gender {
-    Male,
-    Female,
+    Masculine,
+    Feminine,
     Unisex,
 }
